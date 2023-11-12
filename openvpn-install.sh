@@ -113,7 +113,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		apt-get install -y wget
 	fi
 	clear
-	echo '欢迎使用OpenVPN 安装程序！!'
+	echo '----------openvpn一键脚本----------'
 	# If system has a single IPv4, it is selected automatically. Else, ask the user
 	if [[ $(ip -4 addr | grep inet | grep -vEc '127(\.[0-9]{1,3}){3}') -eq 1 ]]; then
 		ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
@@ -166,7 +166,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "OpenVPN 选择协议"
 	echo "   1) UDP (默认)"
 	echo "   2) TCP"
-	read -p "Protocol [1]: " protocol
+	read -p "协议 [1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
 		read -p "Protocol [1]: " protocol
@@ -181,33 +181,36 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	esac
 	echo
 	echo "OpenVPN监听端口"
-	read -p "Port [1194]: " port
+	read -p "端口
+ [1194]: " port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
 		read -p "Port [1194]: " port
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
-	echo "选择 DNS 服务器"
+	echo "选择DNS服务器"
+"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "DNS server [1]: " dns
+	read -p "DNS服务器[1]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: invalid selection."
 		read -p "DNS 服务器 [1]: " dns
 	done
 	echo
 	echo "输入用户名"
-	read -p "Name [client]: " unsanitized_client
+	read -p "用户名
+[client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
-	echo "OpenVPN 准备安装"
+	echo "OpenVPN安装中.........."
 	# Install a firewall if firewalld or iptables are not already available
 	if ! systemctl is-active --quiet firewalld.service && ! hash iptables 2>/dev/null; then
 		if [[ "$os" == "centos" || "$os" == "fedora" ]]; then
@@ -220,7 +223,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 			firewall="iptables"
 		fi
 	fi
-	read -n1 -r -p "按任意键继续..."
+	read -n1 -r -p "按任意键继续............."
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
 		mkdir /etc/systemd/system/openvpn-server@server.service.d/ 2>/dev/null
@@ -437,18 +440,18 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo
 	echo "安装完成"
 	echo
-	echo "客户端配置目录" ~/"$client.ovpn"
+	echo "配置文件目录" ~/"$client.ovpn"
 	echo "可再次运行此脚本来添加新用户"
 else
 	clear
-	echo "OpenVPN 已安装。"
+	echo "OpenVPN 已安装"
 	echo
 	echo "选择: "
-	echo "   1) 添加新用户"
-	echo "   2) 移除一个用户"
-	echo "   3) 卸载 OpenVPN"
+	echo "   1) 添加用户"
+	echo "   2) 移除用户"
+	echo "   3) 卸载openvpn"
 	echo "   4) 退出"
-	read -p "Option: " option
+	read -p "选项" option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: invalid selection."
 		read -p "Option: " option
@@ -557,10 +560,10 @@ else
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "OpenVPN卸载完成"
+				echo "openvpn卸载完成"
 			else
 				echo
-				echo "OpenVPN删除中止!"
+				echo "openvpn删除中止!"
 			fi
 			exit
 		;;
