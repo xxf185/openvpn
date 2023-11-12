@@ -169,7 +169,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	read -p "选择[1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
-		read -p "Protocol [1]: " protocol
+		read -p "选择[1]: " protocol
 	done
 	case "$protocol" in
 		1|"") 
@@ -184,7 +184,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	read -p "默认[1194]: " port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
-		read -p "Port [1194]: " port
+		read -p "默认[1194]: " port
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
@@ -198,7 +198,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	read -p "选择[4]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: 选择错误"
-		read -p "DNS 服务器 [4]: " dns
+		read -p "选择[4]: " dns
 	done
 	echo
 	echo "输入用户名"
@@ -456,7 +456,7 @@ else
 	read -p "选择:" option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: 选择错误"
-		read -p "Option: " option
+		read -p "选择: " option
 	done
 	case "$option" in
 		1)
@@ -466,7 +466,7 @@ else
 			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 			while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
 				echo "$client: invalid name."
-				read -p "Name: " unsanitized_client
+				read -p "client: " unsanitized_client
 				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 			done
 			cd /etc/openvpn/server/easy-rsa/
@@ -492,7 +492,7 @@ else
 			read -p "选择: " client_number
 			until [[ "$client_number" =~ ^[0-9]+$ && "$client_number" -le "$number_of_clients" ]]; do
 				echo "$client_number:选择错误"
-				read -p "Client: " client_number
+				read -p "选择:  " client_number
 			done
 			client=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$client_number"p)
 			echo
@@ -519,7 +519,7 @@ else
 		;;
 		3)
 			echo
-			read -p "卸载openvpn? [y/N]: " remove
+			read -p "确认卸载openvpn? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
 				echo "$remove: 选择错误"
 				read -p "确认卸载openvpn? [y/N]: " remove
