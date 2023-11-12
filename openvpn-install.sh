@@ -2,7 +2,7 @@
 #
 # https://github.com/xxf185/openvpn
 #
-# Copyright (c) 2013 Nyr. Released under the MIT License.
+# Copyright (c) 2023 xxf. Released under the MIT License.
 
 
 # Detect Debian users running the script with "sh" instead of bash
@@ -444,7 +444,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 else
 	clear
  	echo 
-	echo "OpenVPN 已安装"
+	echo "openvpn已安装"
 	echo
 	echo "--------------------openvpn一键脚本--------------------"
 	echo
@@ -474,7 +474,7 @@ else
 			# Generates the custom client.ovpn
 			new_client
 			echo
-			echo "$client 已添加. 配置文件位于:" ~/"$client.ovpn"
+			echo "$client 已添加. 配置文件目录:" ~/"$client.ovpn"
 			exit
 		;;
 		2)
@@ -519,10 +519,10 @@ else
 		;;
 		3)
 			echo
-			read -p "卸载OpenVPN? [y/N]: " remove
+			read -p "卸载openvpn? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
 				echo "$remove: 选择错误"
-				read -p "确认卸载OpenVPN? [y/N]: " remove
+				read -p "确认卸载openvpn? [y/N]: " remove
 			done
 			if [[ "$remove" =~ ^[yY]$ ]]; then
 				port=$(grep '^port ' /etc/openvpn/server/server.conf | cut -d " " -f 2)
