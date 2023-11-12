@@ -482,7 +482,7 @@ else
 			number_of_clients=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep -c "^V")
 			if [[ "$number_of_clients" = 0 ]]; then
 				echo
-				echo "There are no existing clients!"
+				echo "没有用户"
 				exit
 			fi
 			echo
@@ -509,10 +509,10 @@ else
 				# CRL is read with each client connection, when OpenVPN is dropped to nobody
 				chown nobody:"$group_name" /etc/openvpn/server/crl.pem
 				echo
-				echo "删除$client 完成"
+				echo "移除$client 完成"
 			else
 				echo
-				echo "删除$client 终止"
+				echo "移除$client取消"
 			fi
 			exit
 		;;
@@ -520,7 +520,7 @@ else
 			echo
 			read -p "卸载OpenVPN? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
-				echo "$remove: invalid selection."
+				echo "$remove: 选择错误"
 				read -p "确认卸载OpenVPN? [y/N]: " remove
 			done
 			if [[ "$remove" =~ ^[yY]$ ]]; then
@@ -561,7 +561,7 @@ else
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "openvpn卸载完成"
+				echo "卸载完成"
 			else
 				echo
 			fi
