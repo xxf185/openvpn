@@ -514,7 +514,7 @@ else
 		;;
 		3)
 			echo
-			read -p "Confirm OpenVPN removal? [y/N]: " remove
+			read -p "卸载OpenVPN? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
 				echo "$remove: invalid selection."
 				read -p "Confirm OpenVPN removal? [y/N]: " remove
@@ -557,10 +557,10 @@ else
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "OpenVPN removed!"
+				echo "OpenVPN卸载完成"
 			else
 				echo
-				echo "OpenVPN removal aborted!"
+				echo "OpenVPN删除中止!"
 			fi
 			exit
 		;;
