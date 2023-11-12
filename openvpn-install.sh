@@ -509,10 +509,10 @@ else
 				# CRL is read with each client connection, when OpenVPN is dropped to nobody
 				chown nobody:"$group_name" /etc/openvpn/server/crl.pem
 				echo
-				echo "移除$client 完成"
+				echo "删除$client 完成"
 			else
 				echo
-				echo "$client revocation aborted!"
+				echo "删除$client 终止"
 			fi
 			exit
 		;;
