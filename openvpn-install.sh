@@ -166,10 +166,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "协议"
 	echo "   1) UDP (默认)"
 	echo "   2) TCP"
-	read -p "选择[1]: " protocol
+	read -p "选择[1]:" protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
-		read -p "选择[1]: " protocol
+		read -p "选择[1]:" protocol
 	done
 	case "$protocol" in
 		1|"") 
@@ -181,10 +181,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	esac
 	echo
 	echo "端口"
-	read -p "默认[1194]: " port
+	read -p "默认[1194]:" port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
-		read -p "默认[1194]: " port
+		read -p "默认[1194]:" port
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
@@ -195,10 +195,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "选择[4]: " dns
+	read -p "选择[4]:" dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: 选择错误"
-		read -p "选择[4]: " dns
+		read -p "选择[4]:" dns
 	done
 	echo
 	echo "输入用户名"
@@ -456,17 +456,17 @@ else
 	read -p "选择:" option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: 选择错误"
-		read -p "选择: " option
+		read -p "选择:" option
 	done
 	case "$option" in
 		1)
 			echo
 			echo "添加用户"
-			read -p "client: " unsanitized_client
+			read -p "client:" unsanitized_client
 			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 			while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
 				echo "$client: invalid name."
-				read -p "client: " unsanitized_client
+				read -p "client:" unsanitized_client
 				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 			done
 			cd /etc/openvpn/server/easy-rsa/
@@ -489,17 +489,17 @@ else
 			echo
 			echo "移除用户"
 			tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
-			read -p "选择: " client_number
+			read -p "选择:" client_number
 			until [[ "$client_number" =~ ^[0-9]+$ && "$client_number" -le "$number_of_clients" ]]; do
 				echo "$client_number:选择错误"
-				read -p "选择:  " client_number
+				read -p "选择:" client_number
 			done
 			client=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$client_number"p)
 			echo
-			read -p "确认移除 $client? [y/N]: " revoke
+			read -p "确认移除 $client?[y/N]: " revoke
 			until [[ "$revoke" =~ ^[yYnN]*$ ]]; do
 				echo "$revoke: invalid selection."
-				read -p "确认移除 $client? [y/N]: " revoke
+				read -p "确认移除 $client?[y/N]: " revoke
 			done
 			if [[ "$revoke" =~ ^[yY]$ ]]; then
 				cd /etc/openvpn/server/easy-rsa/
@@ -510,7 +510,7 @@ else
 				# CRL is read with each client connection, when OpenVPN is dropped to nobody
 				chown nobody:"$group_name" /etc/openvpn/server/crl.pem
 				echo
-				echo "移除$client 完成"
+				echo "移除$client完成"
 			else
 				echo
 				echo "移除$client取消"
@@ -519,10 +519,10 @@ else
 		;;
 		3)
 			echo
-			read -p "确认卸载openvpn? [y/N]: " remove
+			read -p "确认卸载openvpn?[y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
 				echo "$remove: 选择错误"
-				read -p "确认卸载openvpn? [y/N]: " remove
+				read -p "确认卸载openvpn?[y/N]: " remove
 			done
 			if [[ "$remove" =~ ^[yY]$ ]]; then
 				port=$(grep '^port ' /etc/openvpn/server/server.conf | cut -d " " -f 2)
