@@ -444,7 +444,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 else
 	clear
  	echo 
-	echo "openvpn已安装"
+	echo 
 	echo
 	echo "--------------------openvpn一键脚本--------------------"
 	echo
