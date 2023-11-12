@@ -160,7 +160,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	fi
 	echo
 	echo "协议"
-	echo "   1) UDP (recommended)"
+	echo "   1) UDP (默认)"
 	echo "   2) TCP"
 	read -p "选择 [1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
