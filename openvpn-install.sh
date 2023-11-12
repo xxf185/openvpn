@@ -190,7 +190,6 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	[[ -z "$port" ]] && port="1194"
 	echo
 	echo "选择DNS服务器"
-"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
