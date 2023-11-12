@@ -461,7 +461,7 @@ else
 	case "$option" in
 		1)
 			echo
-			echo "新用户"
+			echo "添加用户"
 			read -p "client: " unsanitized_client
 			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 			while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
