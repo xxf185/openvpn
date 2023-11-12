@@ -201,7 +201,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		read -p "DNS 服务器 [1]: " dns
 	done
 	echo
-	echo "输入用户名"
+	echo "   输入用户名"
 	read -p "[client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
