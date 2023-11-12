@@ -188,20 +188,20 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
-	echo "   DNS服务器"
+	echo "DNS服务器"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "选择[1]: " dns
+	read -p "选择[4]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: 选择错误"
-		read -p "DNS 服务器 [1]: " dns
+		read -p "DNS 服务器 [4]: " dns
 	done
 	echo
-	echo "   输入用户名"
+	echo "输入用户名"
 	read -p "[client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
