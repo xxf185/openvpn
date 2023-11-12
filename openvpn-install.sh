@@ -443,6 +443,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo "可再次运行此脚本来添加新用户"
 else
 	clear
+ 	echo 
 	echo "OpenVPN 已安装"
 	echo
 	echo "--------------------openvpn一键脚本--------------------"
