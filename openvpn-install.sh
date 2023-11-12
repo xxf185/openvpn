@@ -163,10 +163,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		ip6=$(ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | sed -n "$ip6_number"p)
 	fi
 	echo
-	echo "OpenVPN协议"
+	echo "OpenVPN 选择协议"
 	echo "   1) UDP (默认)"
 	echo "   2) TCP"
-	read -p "选择 [1]: " protocol
+	read -p "协议 [1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
 		read -p "Protocol [1]: " protocol
@@ -180,30 +180,30 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		;;
 	esac
 	echo
-	echo "监听端口"
-	read -p "[1194]: " port
+	echo "OpenVPN监听端口"
+	read -p "端口
+ [1194]: " port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
 		read -p "Port [1194]: " port
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
-	echo "选择DNS服务器"
+	echo "DNS服务器"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "DNS服务器[1]: " dns
+	read -p "选择[1]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: invalid selection."
 		read -p "DNS 服务器 [1]: " dns
 	done
 	echo
 	echo "输入用户名"
-	read -p "用户名
-[client]: " unsanitized_client
+	read -p "[client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
