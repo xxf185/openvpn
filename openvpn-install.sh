@@ -125,7 +125,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}' | nl -s ') '
 		read -p "IPv4 address [1]: " ip_number
 		until [[ -z "$ip_number" || "$ip_number" =~ ^[0-9]+$ && "$ip_number" -le "$number_of_ip" ]]; do
-			echo "$ip_number: invalid selection."
+			echo "$ip_number: 选择错误"
 			read -p "IPv4 address [1]: " ip_number
 		done
 		[[ -z "$ip_number" ]] && ip_number="1"
@@ -157,7 +157,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | nl -s ') '
 		read -p "IPv6 address [1]: " ip6_number
 		until [[ -z "$ip6_number" || "$ip6_number" =~ ^[0-9]+$ && "$ip6_number" -le "$number_of_ip6" ]]; do
-			echo "$ip6_number: invalid selection."
+			echo "$ip6_number: 选择错误"
 			read -p "IPv6 address [1]: " ip6_number
 		done
 		[[ -z "$ip6_number" ]] && ip6_number="1"
@@ -169,7 +169,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "   2) TCP"
 	read -p "选择 [1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
-		echo "$protocol: invalid selection."
+		echo "$protocol: 选择错误"
 		read -p "选择 [1]: " protocol
 	done
 	case "$protocol" in
@@ -198,7 +198,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "   6) AdGuard"
 	read -p "选择 [4]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
-		echo "$dns: invalid selection."
+		echo "$dns: 选择错误"
 		read -p "选择 [4]: " dns
 	done
 	echo
@@ -451,7 +451,7 @@ else
 	echo "   4) 退出"
 	read -p "选择: " option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
-		echo "$option: invalid selection."
+		echo "$option: 选择错误"
 		read -p "选择: " option
 	done
 	case "$option" in
@@ -487,14 +487,14 @@ else
 			tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
 			read -p "Client: " client_number
 			until [[ "$client_number" =~ ^[0-9]+$ && "$client_number" -le "$number_of_clients" ]]; do
-				echo "$client_number: invalid selection."
+				echo "$client_number: 选择错误"
 				read -p "Client: " client_number
 			done
 			client=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$client_number"p)
 			echo
 			read -p "移除 $client? [y/N]: " revoke
 			until [[ "$revoke" =~ ^[yYnN]*$ ]]; do
-				echo "$revoke: invalid selection."
+				echo "$revoke: 选择错误"
 				read -p "移除 $client? [y/N]: " revoke
 			done
 			if [[ "$revoke" =~ ^[yY]$ ]]; then
@@ -517,7 +517,7 @@ else
 			echo
 			read -p "卸载OpenVPN? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
-				echo "$remove: invalid selection."
+				echo "$remove: 选择错误"
 				read -p "卸载OpenVPN? [y/N]: " remove
 			done
 			if [[ "$remove" =~ ^[yY]$ ]]; then
