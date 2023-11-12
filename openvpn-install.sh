@@ -191,7 +191,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo
 	echo "选择DNS服务器"
 "
-	echo "   1) Current system resolvers"
+	echo "   1) Current system resolvers
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
