@@ -163,8 +163,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		ip6=$(ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | sed -n "$ip6_number"p)
 	fi
 	echo
-	echo "协议"
-	echo
+	echo "    协议"
 	echo "   1) UDP (默认)"
 	echo "   2) TCP"
 	read -p "选择[1]: " protocol
@@ -182,7 +181,6 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	esac
 	echo
 	echo "端口"
-	echo
 	read -p "默认[1194]: " port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
@@ -190,15 +188,13 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
-	echo "DNS服务器"
-	echo
+	echo "   DNS服务器"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	echo
 	read -p "选择[1]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: 选择错误"
@@ -206,13 +202,13 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	done
 	echo
 	echo "输入用户名"
-	echo
 	read -p "[client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
 	echo "OpenVPN安装中.........."
+	echo
 	# Install a firewall if firewalld or iptables are not already available
 	if ! systemctl is-active --quiet firewalld.service && ! hash iptables 2>/dev/null; then
 		if [[ "$os" == "centos" || "$os" == "fedora" ]]; then
@@ -226,7 +222,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		fi
 	fi
 	echo
-	read -n1 -r -p "按任意键继续............."
+	read -n1 -r -p "按任意键继续.........."
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
 		mkdir /etc/systemd/system/openvpn-server@server.service.d/ 2>/dev/null
