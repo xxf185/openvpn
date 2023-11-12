@@ -163,7 +163,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		ip6=$(ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | sed -n "$ip6_number"p)
 	fi
 	echo
-	echo "    协议"
+	echo "协议"
 	echo "   1) UDP (默认)"
 	echo "   2) TCP"
 	read -p "选择[1]: " protocol
