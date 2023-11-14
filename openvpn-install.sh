@@ -447,6 +447,7 @@ else
 	echo "检测到脚本已经安装"
 	echo
 	echo "——————————OpenVPN——————————"
+	echo ""
 	echo "   1) Add a new client"
 	echo "   2) Revoke an existing client"
 	echo "   3) Remove OpenVPN"
