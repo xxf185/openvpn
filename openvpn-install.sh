@@ -443,7 +443,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo "New clients can be added by running this script again."
 else
 	clear
-	echo "OpenVPN is already installed."
+	echo "检测到脚本已经安装"
 	echo
 	echo "Select an option:"
 	echo "   1) Add a new client"
