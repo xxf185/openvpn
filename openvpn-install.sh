@@ -443,9 +443,10 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo "New clients can be added by running this script again."
 else
 	clear
+	echo ""
 	echo "检测到脚本已经安装"
 	echo
-	echo "Select an option:"
+	echo "——————————OpenVPN——————————"
 	echo "   1) Add a new client"
 	echo "   2) Revoke an existing client"
 	echo "   3) Remove OpenVPN"
