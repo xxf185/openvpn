@@ -445,7 +445,7 @@ else
 	echo
 	echo '--------------------OpenVPN--------------------'
 	echo
-	echo "OpenVPN已安装。"
+	echo "OpenVPN已安装"
 	echo
 	echo "   1) 添加用户"
 	echo "   2) 移除用户"
