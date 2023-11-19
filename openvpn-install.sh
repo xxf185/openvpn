@@ -486,7 +486,7 @@ else
 				exit
 			fi
 			echo
-			echo "移除用户"
+			echo "用户"
 			tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
 			read -p "选择: " client_number
 			until [[ "$client_number" =~ ^[0-9]+$ && "$client_number" -le "$number_of_clients" ]]; do
