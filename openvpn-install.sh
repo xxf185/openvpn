@@ -167,8 +167,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "协议"
 	echo "   1) UDP (recommended)"
 	echo "   2) TCP"
-	read -p "选择
- [1]: " protocol
+	read -p "选择[1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
 		read -p "Protocol [1]: " protocol
@@ -197,10 +196,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "DNS server [1]: " dns
+	read -p "选择[4]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
 		echo "$dns: invalid selection."
-		read -p "选择 [1]: " dns
+		read -p "选择[4]: " dns
 	done
 	echo
 	echo "输入用户名"
