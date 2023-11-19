@@ -511,7 +511,7 @@ else
 				echo "$client 已移除"
 			else
 				echo
-				echo "$client revocation aborted!"
+				echo "$client 取消移除"
 			fi
 			exit
 		;;
@@ -560,7 +560,7 @@ else
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "卸载完成"
+				echo "OpenVPN卸载完成"
 			else
 				echo
 				echo "OpenVPN取消卸载"
