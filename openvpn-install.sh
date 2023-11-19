@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+
 # https://github.com/xxf185/openvpn-install
 #
 # Copyright (c) 2013 xxf. Released under the MIT License.
@@ -167,10 +168,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "协议"
 	echo "   1) UDP (recommended)"
 	echo "   2) TCP"
-	read -p "选择[1]: " protocol
+	read -p "选择[1]:" protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
 		echo "$protocol: invalid selection."
-		read -p "Protocol [1]: " protocol
+		read -p "选择[1]:" protocol
 	done
 	case "$protocol" in
 		1|"") 
