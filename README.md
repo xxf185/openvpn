@@ -8,7 +8,7 @@ openvpn-安装
 
 运行脚本并按照助手操作：
 
-wget https://git.io/vpn -O openvpn-install.sh && bash openvpn-install.sh
+
 
 一旦结束，您可以再次运行它来添加更多用户，删除其中一些用户，甚至完全卸载 OpenVPN。
 
