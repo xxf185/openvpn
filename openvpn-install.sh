@@ -15,12 +15,6 @@ fi
 # Discard stdin. Needed when running from an one-liner which includes a newline
 read -N 999999 -t 0.001
 
-# Detect OpenVZ 6
-if [[ $(uname -r | cut -d "." -f 1) -eq 2 ]]; then
-	echo "系统正在运行旧内核，与此安装程序不兼容."
-	exit
-fi
-
 # Detect OS
 # $os_version variables aren't always in use, but are kept here for convenience
 if grep -qs "ubuntu" /etc/os-release; then
@@ -228,8 +222,8 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 		apt-get update
 		apt-get install -y --no-install-recommends openvpn openssl ca-certificates $firewall
 	elif [[ "$os" = "centos" ]]; then
-		yum install -y epel-release
-		yum install -y openvpn openssl ca-certificates tar $firewall
+		dnf install -y epel-release
+		dnf install -y openvpn openssl ca-certificates tar $firewall
 	else
 		# Else, OS must be Fedora
 		dnf install -y openvpn openssl ca-certificates tar $firewall
