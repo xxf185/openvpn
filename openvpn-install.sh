@@ -8,7 +8,7 @@
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
-	echo 'This installer needs to be run with "bash", not "sh".'
+	echo '此安装程序需要使用 "bash", 不是 "sh".'
 	exit
 fi
 
@@ -17,7 +17,7 @@ read -N 999999 -t 0.001
 
 # Detect OpenVZ 6
 if [[ $(uname -r | cut -d "." -f 1) -eq 2 ]]; then
-	echo "The system is running an old kernel, which is incompatible with this installer."
+	echo "系统正在运行旧内核，与此安装程序不兼容."
 	exit
 fi
 
@@ -40,49 +40,44 @@ elif [[ -e /etc/fedora-release ]]; then
 	os_version=$(grep -oE '[0-9]+' /etc/fedora-release | head -1)
 	group_name="nobody"
 else
-	echo "This installer seems to be running on an unsupported distribution.
-Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora."
+	echo "此安装程序似乎正在不受支持的发行版上运行.受支持的发行版包括 Ubuntu、Debian、AlmaLinux、Rocky Linux、CentOS 和 Fedora。"
 	exit
 fi
 
 if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
-	echo "Ubuntu 18.04 or higher is required to use this installer.
-This version of Ubuntu is too old and unsupported."
+	echo "使用此安装程序需要 Ubuntu 18.04 或更高版本."
 	exit
 fi
 
 if [[ "$os" == "debian" ]]; then
 	if grep -q '/sid' /etc/debian_version; then
-		echo "Debian Testing and Debian Unstable are unsupported by this installer."
+		echo "此安装程序不支持 Debian Testing 和 Debian Unstable."
 		exit
 	fi
 	if [[ "$os_version" -lt 9 ]]; then
-		echo "Debian 9 or higher is required to use this installer.
-This version of Debian is too old and unsupported."
+		echo "使用此安装程序需要 Debian 9 或更高版本."
 		exit
 	fi
 fi
 
 if [[ "$os" == "centos" && "$os_version" -lt 7 ]]; then
-	echo "CentOS 7 or higher is required to use this installer.
-This version of CentOS is too old and unsupported."
+	echo "使用此安装程序需要 CentOS 7 或更高版本."
 	exit
 fi
 
 # Detect environments where $PATH does not include the sbin directories
 if ! grep -q sbin <<< "$PATH"; then
-	echo '$PATH does not include sbin. Try using "su -" instead of "su".'
+	echo '$PATH 不包括 sbin。请尝试使用“su -”代替“su”.'
 	exit
 fi
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "This installer needs to be run with superuser privileges."
+	echo "此安装程序需要以root用户运行."
 	exit
 fi
 
 if [[ ! -e /dev/net/tun ]] || ! ( exec 7<>/dev/net/tun ) 2>/dev/null; then
-	echo "The system does not have the TUN device available.
-TUN needs to be enabled before running this installer."
+	echo "系统没有可用的 TUN 设备.运行此安装程序之前需要启用 TUN."
 	exit
 fi
 
@@ -108,8 +103,8 @@ new_client () {
 if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	# Detect some Debian minimal setups where neither wget nor curl are installed
 	if ! hash wget 2>/dev/null && ! hash curl 2>/dev/null; then
-		echo "Wget is required to use this installer."
-		read -n1 -r -p "Press any key to install Wget and continue..."
+		echo "使用此安装程序需要 Wget."
+		read -n1 -r -p "按任意键安装Wget并继续..."
 		apt-get update
 		apt-get install -y wget
 	fi
