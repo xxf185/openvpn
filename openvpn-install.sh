@@ -1,14 +1,13 @@
 #!/bin/bash
 #
-
-# https://github.com/xxf185/openvpn-install
+# https://github.com/Nyr/openvpn-install
 #
-# Copyright (c) 2013 xxf. Released under the MIT License.
+# Copyright (c) 2013 Nyr. Released under the MIT License.
 
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
-	echo '此安装程序需要使用 "bash", 不是 "sh".'
+	echo 'This installer needs to be run with "bash", not "sh".'
 	exit
 fi
 
@@ -34,44 +33,50 @@ elif [[ -e /etc/fedora-release ]]; then
 	os_version=$(grep -oE '[0-9]+' /etc/fedora-release | head -1)
 	group_name="nobody"
 else
-	echo "此安装程序似乎正在不受支持的发行版上运行.受支持的发行版包括 Ubuntu、Debian、AlmaLinux、Rocky Linux、CentOS 和 Fedora。"
+	echo "This installer seems to be running on an unsupported distribution.
+Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora."
 	exit
 fi
 
 if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
-	echo "使用此安装程序需要 Ubuntu 18.04 或更高版本."
+	echo "Ubuntu 18.04 or higher is required to use this installer.
+This version of Ubuntu is too old and unsupported."
 	exit
 fi
 
 if [[ "$os" == "debian" ]]; then
 	if grep -q '/sid' /etc/debian_version; then
-		echo "此安装程序不支持 Debian Testing 和 Debian Unstable."
+		echo "Debian Testing and Debian Unstable are unsupported by this installer."
 		exit
 	fi
-	if [[ "$os_version" -lt 9 ]]; then
-		echo "使用此安装程序需要 Debian 9 或更高版本."
+	if [[ "$os_version" -lt 11 ]]; then
+		echo "Debian 11 or higher is required to use this installer.
+This version of Debian is too old and unsupported."
 		exit
 	fi
 fi
 
-if [[ "$os" == "centos" && "$os_version" -lt 7 ]]; then
-	echo "使用此安装程序需要 CentOS 7 或更高版本."
+if [[ "$os" == "centos" && "$os_version" -lt 9 ]]; then
+	os_name=$(sed 's/ release.*//' /etc/almalinux-release /etc/rocky-release /etc/centos-release 2>/dev/null | head -1)
+	echo "$os_name 9 or higher is required to use this installer.
+This version of $os_name is too old and unsupported."
 	exit
 fi
 
 # Detect environments where $PATH does not include the sbin directories
 if ! grep -q sbin <<< "$PATH"; then
-	echo '$PATH 不包括 sbin。请尝试使用“su -”代替“su”.'
+	echo '$PATH does not include sbin. Try using "su -" instead of "su".'
 	exit
 fi
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "此安装程序需要以root用户运行."
+	echo "This installer needs to be run with superuser privileges."
 	exit
 fi
 
 if [[ ! -e /dev/net/tun ]] || ! ( exec 7<>/dev/net/tun ) 2>/dev/null; then
-	echo "系统没有可用的 TUN 设备.运行此安装程序之前需要启用 TUN."
+	echo "The system does not have the TUN device available.
+TUN needs to be enabled before running this installer."
 	exit
 fi
 
@@ -97,26 +102,25 @@ new_client () {
 if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	# Detect some Debian minimal setups where neither wget nor curl are installed
 	if ! hash wget 2>/dev/null && ! hash curl 2>/dev/null; then
-		echo "使用此安装程序需要 Wget."
-		read -n1 -r -p "按任意键安装Wget并继续..."
+		echo "Wget is required to use this installer."
+		read -n1 -r -p "Press any key to install Wget and continue..."
 		apt-get update
 		apt-get install -y wget
 	fi
 	clear
-                 echo 
-	echo '--------------------OpenVPN--------------------'
+	echo 'Welcome to this OpenVPN road warrior installer!'
 	# If system has a single IPv4, it is selected automatically. Else, ask the user
 	if [[ $(ip -4 addr | grep inet | grep -vEc '127(\.[0-9]{1,3}){3}') -eq 1 ]]; then
 		ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
 	else
 		number_of_ip=$(ip -4 addr | grep inet | grep -vEc '127(\.[0-9]{1,3}){3}')
 		echo
-		echo "IPv4 address"
+		echo "Which IPv4 address should be used?"
 		ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}' | nl -s ') '
-		read -p "选择[1]: " ip_number
+		read -p "IPv4 address [1]: " ip_number
 		until [[ -z "$ip_number" || "$ip_number" =~ ^[0-9]+$ && "$ip_number" -le "$number_of_ip" ]]; do
-			echo "$ip_number: 选择错误"
-			read -p "选择[1]: " ip_number
+			echo "$ip_number: invalid selection."
+			read -p "IPv4 address [1]: " ip_number
 		done
 		[[ -z "$ip_number" ]] && ip_number="1"
 		ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}' | sed -n "$ip_number"p)
@@ -143,24 +147,24 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	if [[ $(ip -6 addr | grep -c 'inet6 [23]') -gt 1 ]]; then
 		number_of_ip6=$(ip -6 addr | grep -c 'inet6 [23]')
 		echo
-		echo "IPv6 address"
+		echo "Which IPv6 address should be used?"
 		ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | nl -s ') '
-		read -p "选择 [1]: " ip6_number
+		read -p "IPv6 address [1]: " ip6_number
 		until [[ -z "$ip6_number" || "$ip6_number" =~ ^[0-9]+$ && "$ip6_number" -le "$number_of_ip6" ]]; do
-			echo "$ip6_number: 选择错误"
-			read -p "选择 [1]: " ip6_number
+			echo "$ip6_number: invalid selection."
+			read -p "IPv6 address [1]: " ip6_number
 		done
 		[[ -z "$ip6_number" ]] && ip6_number="1"
 		ip6=$(ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}' | sed -n "$ip6_number"p)
 	fi
 	echo
-	echo "协议"
-	echo "   1) UDP (推荐)"
+	echo "Which protocol should OpenVPN use?"
+	echo "   1) UDP (recommended)"
 	echo "   2) TCP"
-	read -p "选择[1]:" protocol
+	read -p "Protocol [1]: " protocol
 	until [[ -z "$protocol" || "$protocol" =~ ^[12]$ ]]; do
-		echo "$protocol: 选择错误"
-		read -p "选择[1]:" protocol
+		echo "$protocol: invalid selection."
+		read -p "Protocol [1]: " protocol
 	done
 	case "$protocol" in
 		1|"") 
@@ -171,7 +175,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		;;
 	esac
 	echo
-	echo "端口"
+	echo "What port should OpenVPN listen to?"
 	read -p "Port [1194]: " port
 	until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 		echo "$port: invalid port."
@@ -179,26 +183,26 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	done
 	[[ -z "$port" ]] && port="1194"
 	echo
-	echo "DNS server"
+	echo "Select a DNS server for the clients:"
 	echo "   1) Current system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
-	read -p "选择[4]: " dns
+	read -p "DNS server [1]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
-		echo "$dns: 选择错误"
-		read -p "选择[4]: " dns
+		echo "$dns: invalid selection."
+		read -p "DNS server [1]: " dns
 	done
 	echo
-	echo "输入用户名"
+	echo "Enter a name for the first client:"
 	read -p "Name [client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
-	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
-	echo "OpenVPN安装中..."
+	echo "OpenVPN installation is ready to begin."
 	# Install a firewall if firewalld or iptables are not already available
 	if ! systemctl is-active --quiet firewalld.service && ! hash iptables 2>/dev/null; then
 		if [[ "$os" == "centos" || "$os" == "fedora" ]]; then
@@ -211,7 +215,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 			firewall="iptables"
 		fi
 	fi
-	read -n1 -r -p "按任意键继续..."
+	read -n1 -r -p "Press any key to continue..."
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
 		mkdir /etc/systemd/system/openvpn-server@server.service.d/ 2>/dev/null
@@ -233,7 +237,7 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 		systemctl enable --now firewalld.service
 	fi
 	# Get easy-rsa
-	easy_rsa_url='https://github.com/xxf185/easy-rsa/releases/latest/download/EasyRSA-3.2.0.tgz'
+	easy_rsa_url='https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.0/EasyRSA-3.2.0.tgz'
 	mkdir -p /etc/openvpn/server/easy-rsa/
 	{ wget -qO- "$easy_rsa_url" 2>/dev/null || curl -sL "$easy_rsa_url" ; } | tar xz -C /etc/openvpn/server/easy-rsa/ --strip-components 1
 	chown -R root:root /etc/openvpn/server/easy-rsa/
@@ -420,43 +424,41 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	# Generates the custom client.ovpn
 	new_client
 	echo
-	echo "安装完成"
+	echo "Finished!"
 	echo
-	echo "配置文件目录:" ~/"$client.ovpn"
-	echo "可以通过再次运行此脚本来添加新用户"
+	echo "The client configuration is available in:" ~/"$client.ovpn"
+	echo "New clients can be added by running this script again."
 else
 	clear
-	echo 
-	echo '--------------------OpenVPN--------------------'
-	echo 
-	echo "OpenVPN已经安装"
-	echo 
-	echo "   1) 添加新用户"
-	echo "   2) 移除用户"
-	echo "   3) 卸载OpenVPN"
-	echo "   4) 退出"
-	read -p "选择: " option
+	echo "OpenVPN is already installed."
+	echo
+	echo "Select an option:"
+	echo "   1) Add a new client"
+	echo "   2) Revoke an existing client"
+	echo "   3) Remove OpenVPN"
+	echo "   4) Exit"
+	read -p "Option: " option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
-		echo "$option: 选择错误"
-		read -p "选择: " option
+		echo "$option: invalid selection."
+		read -p "Option: " option
 	done
 	case "$option" in
 		1)
 			echo
-			echo "添加新用户:"
+			echo "Provide a name for the client:"
 			read -p "Name: " unsanitized_client
-			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 			while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
 				echo "$client: invalid name."
 				read -p "Name: " unsanitized_client
-				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 			done
 			cd /etc/openvpn/server/easy-rsa/
 			./easyrsa --batch --days=3650 build-client-full "$client" nopass
 			# Generates the custom client.ovpn
 			new_client
 			echo
-			echo "$client已添加.配置文件目录:" ~/"$client.ovpn"
+			echo "$client added. Configuration available in:" ~/"$client.ovpn"
 			exit
 		;;
 		2)
@@ -465,23 +467,23 @@ else
 			number_of_clients=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep -c "^V")
 			if [[ "$number_of_clients" = 0 ]]; then
 				echo
-				echo "没有用户"
+				echo "There are no existing clients!"
 				exit
 			fi
 			echo
-			echo "用户"
+			echo "Select the client to revoke:"
 			tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
-			read -p "选择: " client_number
+			read -p "Client: " client_number
 			until [[ "$client_number" =~ ^[0-9]+$ && "$client_number" -le "$number_of_clients" ]]; do
-				echo "$client_number: 选择错误"
-				read -p "选择: " client_number
+				echo "$client_number: invalid selection."
+				read -p "Client: " client_number
 			done
 			client=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$client_number"p)
 			echo
-			read -p "移除$client? [y/N]: " revoke
+			read -p "Confirm $client revocation? [y/N]: " revoke
 			until [[ "$revoke" =~ ^[yYnN]*$ ]]; do
-				echo "$revoke: 选择错误"
-				read -p "确认移除$client? [y/N]: " revoke
+				echo "$revoke: invalid selection."
+				read -p "Confirm $client revocation? [y/N]: " revoke
 			done
 			if [[ "$revoke" =~ ^[yY]$ ]]; then
 				cd /etc/openvpn/server/easy-rsa/
@@ -492,19 +494,19 @@ else
 				# CRL is read with each client connection, when OpenVPN is dropped to nobody
 				chown nobody:"$group_name" /etc/openvpn/server/crl.pem
 				echo
-				echo "$client已移除"
+				echo "$client revoked!"
 			else
 				echo
-				echo "$client取消移除"
+				echo "$client revocation aborted!"
 			fi
 			exit
 		;;
 		3)
 			echo
-			read -p "卸载OpenVPN? [y/N]: " remove
+			read -p "Confirm OpenVPN removal? [y/N]: " remove
 			until [[ "$remove" =~ ^[yYnN]*$ ]]; do
-				echo "$remove: 选择错误"
-				read -p "卸载OpenVPN? [y/N]: " remove
+				echo "$remove: invalid selection."
+				read -p "Confirm OpenVPN removal? [y/N]: " remove
 			done
 			if [[ "$remove" =~ ^[yY]$ ]]; then
 				port=$(grep '^port ' /etc/openvpn/server/server.conf | cut -d " " -f 2)
@@ -540,14 +542,14 @@ else
 					apt-get remove --purge -y openvpn
 				else
 					# Else, OS must be CentOS or Fedora
-					yum remove -y openvpn
+					dnf remove -y openvpn
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "OpenVPN卸载完成"
+				echo "OpenVPN removed!"
 			else
 				echo
-				echo "OpenVPN取消卸载"
+				echo "OpenVPN removal aborted!"
 			fi
 			exit
 		;;
