@@ -11,7 +11,7 @@ if readlink /proc/$$/exe | grep -q "dash"; then
 	exit
 fi
 
-# Discard stdin. Needed when running from an one-liner which includes a newline
+# Discard stdin. Needed when running from a one-liner which includes a newline
 read -N 999999 -t 0.001
 
 # Detect OS
