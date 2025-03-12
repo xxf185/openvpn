@@ -80,6 +80,9 @@ TUN needs to be enabled before running this installer."
 	exit
 fi
 
+# Store the absolute path of the directory where the script is located
+ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 new_client () {
 	# Generates the custom client.ovpn
 	{
