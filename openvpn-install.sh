@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# https://github.com/xxf185/openvpn
+# https://github.com/Nyr/openvpn-install
 #
-# Copyright (c) 2024 xxf. Released under the MIT License.
+# Copyright (c) 2013 Nyr. Released under the MIT License.
 
 
 # Detect Debian users running the script with "sh" instead of bash
@@ -38,8 +38,8 @@ Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora.
 	exit
 fi
 
-if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
-	echo "Ubuntu 18.04 or higher is required to use this installer.
+if [[ "$os" == "ubuntu" && "$os_version" -lt 2204 ]]; then
+	echo "Ubuntu 22.04 or higher is required to use this installer.
 This version of Ubuntu is too old and unsupported."
 	exit
 fi
@@ -49,8 +49,8 @@ if [[ "$os" == "debian" ]]; then
 		echo "Debian Testing and Debian Unstable are unsupported by this installer."
 		exit
 	fi
-	if [[ "$os_version" -lt 10 ]]; then
-		echo "Debian 10 or higher is required to use this installer.
+	if [[ "$os_version" -lt 11 ]]; then
+		echo "Debian 11 or higher is required to use this installer.
 This version of Debian is too old and unsupported."
 		exit
 	fi
@@ -81,7 +81,7 @@ TUN needs to be enabled before running this installer."
 fi
 
 # Store the absolute path of the directory where the script is located
- script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 new_client () {
 	# Generates the custom client.ovpn
@@ -187,22 +187,46 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	[[ -z "$port" ]] && port="1194"
 	echo
 	echo "Select a DNS server for the clients:"
-	echo "   1) Current system resolvers"
+	echo "   1) Default system resolvers"
 	echo "   2) Google"
 	echo "   3) 1.1.1.1"
 	echo "   4) OpenDNS"
 	echo "   5) Quad9"
 	echo "   6) AdGuard"
+	echo "   7) Specify custom resolvers"
 	read -p "DNS server [1]: " dns
-	until [[ -z "$dns" || "$dns" =~ ^[1-6]$ ]]; do
+	until [[ -z "$dns" || "$dns" =~ ^[1-7]$ ]]; do
 		echo "$dns: invalid selection."
 		read -p "DNS server [1]: " dns
 	done
+	# If the user selected custom resolvers, we deal with that here
+	if [[ "$dns" = "7" ]]; then
+		echo
+		until [[ -n "$custom_dns" ]]; do
+			echo "Enter DNS servers (one or more IPv4 addresses, separated by commas or spaces):"
+			read -p "DNS servers: " dns_input
+			# Convert comma delimited to space delimited
+			dns_input=$(echo "$dns_input" | tr ',' ' ')
+			# Validate and build custom DNS IP list
+			for dns_ip in $dns_input; do
+				if [[ "$dns_ip" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]]; then
+					if [[ -z "$custom_dns" ]]; then
+						custom_dns="$dns_ip"
+					else
+						custom_dns="$custom_dns $dns_ip"
+					fi
+				fi
+			done
+			if [ -z "$custom_dns" ]; then
+				echo "Invalid input."
+			fi
+		done
+	fi
 	echo
 	echo "Enter a name for the first client:"
 	read -p "Name [client]: " unsanitized_client
 	# Allow a limited set of characters to avoid conflicts
-	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
 	echo "OpenVPN installation is ready to begin."
@@ -240,7 +264,7 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 		systemctl enable --now firewalld.service
 	fi
 	# Get easy-rsa
-	easy_rsa_url='https://github.com/xxf185/easy-rsa/releases/download/v3.2.2/EasyRSA-3.2.2.tgz'
+	easy_rsa_url='https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.2/EasyRSA-3.2.2.tgz'
 	mkdir -p /etc/openvpn/server/easy-rsa/
 	{ wget -qO- "$easy_rsa_url" 2>/dev/null || curl -sL "$easy_rsa_url" ; } | tar xz -C /etc/openvpn/server/easy-rsa/ --strip-components 1
 	chown -R root:root /etc/openvpn/server/easy-rsa/
@@ -258,7 +282,7 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 	# Without +x in the directory, OpenVPN can't run a stat() on the CRL file
 	chmod o+x /etc/openvpn/server/
 	# Generate key for tls-crypt
-	openvpn --genkey --secret /etc/openvpn/server/tc.key
+	openvpn --genkey secret /etc/openvpn/server/tc.key
 	# Create the DH parameters file using the predefined ffdhe2048 group
 	echo '-----BEGIN DH PARAMETERS-----
 MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz
@@ -324,6 +348,11 @@ server 10.8.0.0 255.255.255.0" > /etc/openvpn/server/server.conf
 			echo 'push "dhcp-option DNS 94.140.14.14"' >> /etc/openvpn/server/server.conf
 			echo 'push "dhcp-option DNS 94.140.15.15"' >> /etc/openvpn/server/server.conf
 		;;
+		7)
+		for dns_ip in $custom_dns; do
+			echo "push \"dhcp-option DNS $dns_ip\"" >> /etc/openvpn/server/server.conf
+		done
+		;;
 	esac
 	echo 'push "block-outside-dns"' >> /etc/openvpn/server/server.conf
 	echo "keepalive 10 120
@@ -375,24 +404,25 @@ crl-verify crl.pem" >> /etc/openvpn/server/server.conf
 			ip6tables_path=$(command -v ip6tables-legacy)
 		fi
 		echo "[Unit]
-Before=network.target
+After=network-online.target
+Wants=network-online.target
 [Service]
 Type=oneshot
-ExecStart=$iptables_path -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $ip
-ExecStart=$iptables_path -I INPUT -p $protocol --dport $port -j ACCEPT
-ExecStart=$iptables_path -I FORWARD -s 10.8.0.0/24 -j ACCEPT
-ExecStart=$iptables_path -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-ExecStop=$iptables_path -t nat -D POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $ip
-ExecStop=$iptables_path -D INPUT -p $protocol --dport $port -j ACCEPT
-ExecStop=$iptables_path -D FORWARD -s 10.8.0.0/24 -j ACCEPT
-ExecStop=$iptables_path -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" > /etc/systemd/system/openvpn-iptables.service
+ExecStart=$iptables_path -w 5 -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $ip
+ExecStart=$iptables_path -w 5 -I INPUT -p $protocol --dport $port -j ACCEPT
+ExecStart=$iptables_path -w 5 -I FORWARD -s 10.8.0.0/24 -j ACCEPT
+ExecStart=$iptables_path -w 5 -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+ExecStop=$iptables_path -w 5 -t nat -D POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $ip
+ExecStop=$iptables_path -w 5 -D INPUT -p $protocol --dport $port -j ACCEPT
+ExecStop=$iptables_path -w 5 -D FORWARD -s 10.8.0.0/24 -j ACCEPT
+ExecStop=$iptables_path -w 5 -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" > /etc/systemd/system/openvpn-iptables.service
 		if [[ -n "$ip6" ]]; then
-			echo "ExecStart=$ip6tables_path -t nat -A POSTROUTING -s fddd:1194:1194:1194::/64 ! -d fddd:1194:1194:1194::/64 -j SNAT --to $ip6
-ExecStart=$ip6tables_path -I FORWARD -s fddd:1194:1194:1194::/64 -j ACCEPT
-ExecStart=$ip6tables_path -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-ExecStop=$ip6tables_path -t nat -D POSTROUTING -s fddd:1194:1194:1194::/64 ! -d fddd:1194:1194:1194::/64 -j SNAT --to $ip6
-ExecStop=$ip6tables_path -D FORWARD -s fddd:1194:1194:1194::/64 -j ACCEPT
-ExecStop=$ip6tables_path -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" >> /etc/systemd/system/openvpn-iptables.service
+			echo "ExecStart=$ip6tables_path -w 5 -t nat -A POSTROUTING -s fddd:1194:1194:1194::/64 ! -d fddd:1194:1194:1194::/64 -j SNAT --to $ip6
+ExecStart=$ip6tables_path -w 5 -I FORWARD -s fddd:1194:1194:1194::/64 -j ACCEPT
+ExecStart=$ip6tables_path -w 5 -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+ExecStop=$ip6tables_path -w 5 -t nat -D POSTROUTING -s fddd:1194:1194:1194::/64 ! -d fddd:1194:1194:1194::/64 -j SNAT --to $ip6
+ExecStop=$ip6tables_path -w 5 -D FORWARD -s fddd:1194:1194:1194::/64 -j ACCEPT
+ExecStop=$ip6tables_path -w 5 -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" >> /etc/systemd/system/openvpn-iptables.service
 		fi
 		echo "RemainAfterExit=yes
 [Install]
@@ -450,11 +480,11 @@ else
 			echo
 			echo "Provide a name for the client:"
 			read -p "Name: " unsanitized_client
-			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+			client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 			while [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]; do
 				echo "$client: invalid name."
 				read -p "Name: " unsanitized_client
-				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]/_/g' <<< "$unsanitized_client")
+				client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 			done
 			cd /etc/openvpn/server/easy-rsa/
 			./easyrsa --batch --days=3650 build-client-full "$client" nopass
@@ -493,8 +523,8 @@ else
 				./easyrsa --batch revoke "$client"
 				./easyrsa --batch --days=3650 gen-crl
 				rm -f /etc/openvpn/server/crl.pem
-    				rm -f /etc/openvpn/server/easy-rsa/pki/reqs/"$client".req
- 				rm -f /etc/openvpn/server/easy-rsa/pki/private/"$client".key
+				rm -f /etc/openvpn/server/easy-rsa/pki/reqs/"$client".req
+				rm -f /etc/openvpn/server/easy-rsa/pki/private/"$client".key
 				cp /etc/openvpn/server/easy-rsa/pki/crl.pem /etc/openvpn/server/crl.pem
 				# CRL is read with each client connection, when OpenVPN is dropped to nobody
 				chown nobody:"$group_name" /etc/openvpn/server/crl.pem
