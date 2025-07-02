@@ -447,14 +447,14 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo "New clients can be added by running this script again."
 else
 	clear
-	echo "OpenVPN is already installed."
+	echo "OpenVPN 已安装."
 	echo
-	echo "Select an option:"
-	echo "   1) Add a new client"
-	echo "   2) Revoke an existing client"
-	echo "   3) Remove OpenVPN"
-	echo "   4) Exit"
-	read -p "Option: " option
+	echo "请选择:"
+	echo "   1) 添加新用户"
+	echo "   2) 移除用户"
+	echo "   3) 卸载OpenVPN"
+	echo "   4) 退出"
+	read -p "选项: " option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: invalid selection."
 		read -p "Option: " option
@@ -565,10 +565,10 @@ else
 					rm -rf /etc/openvpn/server
 				fi
 				echo
-				echo "OpenVPN removed!"
+				echo "OpenVPN 卸载完成!"
 			else
 				echo
-				echo "OpenVPN removal aborted!"
+				echo "OpenVPN 取消卸载!"
 			fi
 			exit
 		;;
