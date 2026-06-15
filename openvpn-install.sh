@@ -1,17 +1,18 @@
 #!/bin/bash
 #
-# https://github.com/Nyr/openvpn-install
+
+# https://github.com/xxf185/openvpn
 #
-# Copyright (c) 2013 Nyr. Released under the MIT License.
+# Copyright (c) 2024 xxf. Released under the MIT License.
 
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
-	echo 'This installer needs to be run with "bash", not "sh".'
+	echo '此安装程序需要使用 "bash", 不是 "sh".'
 	exit
 fi
 
-# Discard stdin. Needed when running from a one-liner which includes a newline
+# Discard stdin. Needed when running from an one-liner which includes a newline
 read -N 999999 -t 0.001
 
 # Detect OS
@@ -33,33 +34,32 @@ elif [[ -e /etc/fedora-release ]]; then
 	os_version=$(grep -oE '[0-9]+' /etc/fedora-release | head -1)
 	group_name="nobody"
 else
-	echo "This installer seems to be running on an unsupported distribution.
-Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora."
+	echo "此安装程序似乎正在不受支持的发行版上运行.受支持的发行版包括 Ubuntu、Debian、AlmaLinux、Rocky Linux、CentOS 和 Fedora。"
 	exit
 fi
 
 if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
-	echo "Ubuntu 18.04 or higher is required to use this installer.
-This version of Ubuntu is too old and unsupported."
+	echo "使用此安装程序需要 Ubuntu 18.04 或更高版本."
 	exit
 fi
 
 if [[ "$os" == "debian" ]]; then
 	if grep -q '/sid' /etc/debian_version; then
-		echo "Debian Testing and Debian Unstable are unsupported by this installer."
+		echo "此安装程序不支持 Debian Testing 和 Debian Unstable."
 		exit
 	fi
 	if [[ "$os_version" -lt 9 ]]; then
-		echo "Debian 9 or higher is required to use this installer.
-This version of Debian is too old and unsupported."
+		echo "使用此安装程序需要 Debian 9 或更高版本."
 		exit
 	fi
 fi
 
-if [[ "$os" == "centos" && "$os_version" -lt 9 ]]; then
-	os_name=$(sed 's/ release.*//' /etc/almalinux-release /etc/rocky-release /etc/centos-release 2>/dev/null | head -1)
-	echo "$os_name 9 or higher is required to use this installer.
-This version of $os_name is too old and unsupported."
+if [[ "$os" == "centos" && "$os_version" -lt 7 ]]; then
+	echo "使用此安装程序需要 CentOS 7 或更高版本."
+	exit
+fi
+
+# Detect environments where $PATH does not include the sbin directories
 	exit
 fi
 
