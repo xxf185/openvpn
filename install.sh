@@ -455,7 +455,7 @@ else
 	echo "   2) 删除账户"
 	echo "   3) 卸载OpenVPN"
 	echo "   4) 退出"
-	read -p "Option: " option
+	read -p "选项: " option
 	until [[ "$option" =~ ^[1-4]$ ]]; do
 		echo "$option: 选择无效"
 		read -p "选项 " option
