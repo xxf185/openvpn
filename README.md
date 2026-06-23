@@ -4,9 +4,6 @@
 
 安装运行脚本并按照助手操作
 
-```
-wget https://raw.githubusercontent.com/xxf185/openvpn/master/openvpn-install.sh -O openvpn-install.sh && bash openvpn-install.sh
-```
 
 ```
 wget https://raw.githubusercontent.com/xxf185/openvpn/master/install.sh -O install.sh && bash install.sh
