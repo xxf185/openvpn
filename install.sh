@@ -7,7 +7,7 @@
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
-	echo 'This installer needs to be run with "bash", not "sh".'
+	echo '此安装程序需要使用“bash”运行，而不是“sh”.'
 	exit
 fi
 
@@ -33,50 +33,45 @@ elif [[ -e /etc/fedora-release ]]; then
 	os_version=$(grep -oE '[0-9]+' /etc/fedora-release | head -1)
 	group_name="nobody"
 else
-	echo "This installer seems to be running on an unsupported distribution.
-Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora."
+	echo "此安装程序似乎运行在不受支持的发行版上.受支持的发行版包括 Ubuntu.Debian.AlmaLinux.Rocky.Linux.CentOS和Fedora."
 	exit
 fi
 
-if [[ "$os" == "ubuntu" && "$os_version" -lt 2204 ]]; then
-	echo "Ubuntu 22.04 or higher is required to use this installer.
-This version of Ubuntu is too old and unsupported."
+if [[ "$os" == "ubuntu" && "$os_version" -lt1804 ]]; then
+	echo "使用此安装程序需要Ubuntu18.04或更高版本.."
 	exit
 fi
 
 if [[ "$os" == "debian" ]]; then
 	if grep -q '/sid' /etc/debian_version; then
-		echo "Debian Testing and Debian Unstable are unsupported by this installer."
+		echo "此安装程序不支持 Debian Testing 和 Debian Unstable 版本."
 		exit
 	fi
-	if [[ "$os_version" -lt 11 ]]; then
-		echo "Debian 11 or higher is required to use this installer.
-This version of Debian is too old and unsupported."
+	if [[ "$os_version" -lt 9 ]]; then
+		echo "使用此安装程序需要 Debian 9 或更高版本."
 		exit
 	fi
 fi
 
 if [[ "$os" == "centos" && "$os_version" -lt 9 ]]; then
 	os_name=$(sed 's/ release.*//' /etc/almalinux-release /etc/rocky-release /etc/centos-release 2>/dev/null | head -1)
-	echo "$os_name 9 or higher is required to use this installer.
-This version of $os_name is too old and unsupported."
+	echo "$os_name 9 使用此安装程序需要或更高版本."
 	exit
 fi
 
 # Detect environments where $PATH does not include the sbin directories
 if ! grep -q sbin <<< "$PATH"; then
-	echo '$PATH does not include sbin. Try using "su -" instead of "su".'
+	echo '$PATH 中不包含 sbin.请尝试使用“su -”代替“su”'
 	exit
 fi
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "This installer needs to be run with superuser privileges."
+	echo "此安装程序需要以root运行。"
 	exit
 fi
 
 if [[ ! -e /dev/net/tun ]] || ! ( exec 7<>/dev/net/tun ) 2>/dev/null; then
-	echo "The system does not have the TUN device available.
-TUN needs to be enabled before running this installer."
+	echo "系统中没有可用的 TUN 设备.运行此安装程序之前.需要启用 TUN 设备."
 	exit
 fi
 
@@ -86,13 +81,13 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	# Detect some Debian minimal setups where neither wget nor curl are installed
 	if ! hash wget 2>/dev/null && ! hash curl 2>/dev/null; then
-		echo "Wget is required to use this installer."
-		read -n1 -r -p "Press any key to install Wget and continue..."
+		echo "使用此安装程序需要 Wget."
+		read -n1 -r -p "按任意键继续..."
 		apt-get update
 		apt-get install -y wget
 	fi
 	clear
-	echo 'Welcome to this OpenVPN road warrior installer!'
+	echo '----------OpenVPN road warrior installer----------'
 	# If system has a single IPv4, it is selected automatically. Else, ask the user
 	if [[ $(ip -4 addr | grep inet | grep -vEc '127(\.[0-9]{1,3}){3}') -eq 1 ]]; then
 		ip=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}')
