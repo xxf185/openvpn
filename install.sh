@@ -37,7 +37,7 @@ else
 	exit
 fi
 
-if [[ "$os" == "ubuntu" && "$os_version" -lt1804 ]]; then
+if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
 	echo "使用此安装程序需要Ubuntu18.04或更高版本.."
 	exit
 fi
