@@ -8,6 +8,10 @@
 wget https://raw.githubusercontent.com/xxf185/openvpn/master/openvpn-install.sh -O openvpn-install.sh && bash openvpn-install.sh
 ```
 
+```
+wget https://raw.githubusercontent.com/xxf185/openvpn/master/install.sh -O install.sh && bash install.sh
+```
+
 一旦结束，您可以再次运行它来添加更多用户，删除其中一些用户，甚至完全卸载 OpenVPN。
 
 
