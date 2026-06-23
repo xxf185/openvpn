@@ -171,10 +171,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	echo "   6) Gcore"
 	echo "   7) AdGuard"
 	echo "   8) 自定义解析器"
-	read -p "DNS 服务器 [1]: " dns
+	read -p "选项 [1]: " dns
 	until [[ -z "$dns" || "$dns" =~ ^[1-8]$ ]]; do
 		echo "$dns: 选择无效"
-		read -p "DNS 服务器 [1]: " dns
+		read -p "选项 [1]: " dns
 	done
 	# If the user selected custom resolvers, we deal with that here
 	if [[ "$dns" = "8" ]]; then
